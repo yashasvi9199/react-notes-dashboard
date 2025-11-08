@@ -1,6 +1,6 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import TestHook from "./TestHook";
-import { create } from "framer-motion/m";
+import TestTheme from "./TestTheme";
 
-createRoot(document.getElementById("root")).render(<TestHook />);
+createRoot(document.getElementById("root")).render(<TestTheme />);
