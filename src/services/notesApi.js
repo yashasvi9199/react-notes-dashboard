@@ -33,21 +33,36 @@ export const createNote = async(noteData) => {
 
 // Update existing note
 export const updateNote = async (id, noteData) => {
-    try{
-        const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(noteData),
-        });
-
-        if(!response.ok) throw new Error('Failed to update note');
-        return await response.json(noteData);
-    }catch(err){
-        console.error('Error updating note: ',err);
-        throw err;
+  try {
+    console.log('API Update - ID:', id, 'Data:', noteData);
+    
+    // Remove the category field if it's not being used
+    const { category, ...updateData } = noteData;
+    
+    const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+    
+    console.log('API Response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('API Error response:', errorText);
+      throw new Error(`Failed to update note: ${errorText}`);
     }
+    
+    const result = await response.json();
+    console.log('API Success response:', result);
+    return result;
+    
+  } catch (error) {
+    console.error('Error updating note:', error);
+    throw error;
+  }
 };
 
 // Delete note

@@ -88,15 +88,26 @@ function AppInner(){
     }
   };
 
-  //* Save edited note via API
+  // Save edited note via API
   const saveEdit = async (updated) => {
-    try{
-      await updateNote(updateNote.id, updated);
-      await loadNotes();
+    try {
+      console.log('Saving note:', updated);
+      
+      // Send only the fields that can be updated
+      const updateData = {
+        title: updated.title,
+        content: updated.content,
+        category: updated.category
+      };
+      
+      const result = await updateNote(updated.id, updateData);
+      console.log('Update API result:', result);
+      
+      await loadNotes(); // Reload notes
       setEditing(null);
-    }catch(err){
-      console.error("Failed to update note: ",err);
-      alert("Failed to update note.")
+    } catch (error) {
+      console.error('Failed to update note:', error);
+      alert(`Failed to update note: ${error.message}`);
     }
   };
 
