@@ -1,69 +1,64 @@
-import React, {useState, useEffect} from "react";
+// src/components/AddNoteForm.jsx
+import React, { useState, useEffect } from "react";
 
-export default function AddNoteForm ({onAdd, editing, onCancel, onSave}) {
-    const [title, setTitle] = useState("")
-    const [content, setContent] = useState("")
+export default function AddNoteForm({ onAdd, editing, onCancel, onSave }) {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
 
-    // If we are editing, populate the form with existing data
-    useEffect( ()=> {
-     if (editing){
-        setTitle(editing.title || "");
-        setContent(editing.content || "");
-     }else {
-        setTitle("");
-        setContent("");
-     }
-    }, [editing]);
+  useEffect(() => {
+    if (editing) {
+      setTitle(editing.title || "");
+      setContent(editing.content || "");
+    } else {
+      setTitle("");
+      setContent("");
+    }
+  }, [editing]);
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const t = title.trim();
+    const c = content.trim();
+    if (!t && !c) return;
+    if (editing) {
+      onSave && onSave({ ...editing, title: t, content: c });
+    } else {
+      onAdd && onAdd({ title: t || "Untitled", content: c });
+      setTitle("");
+      setContent("");
+    }
+  };
 
-        const trimmedTitle = title.trim();
-        const trimmedContent = content.trim();
+  return (
+    <form onSubmit={handleSubmit}>
+      <label style={{ display: "block", marginBottom: 8, fontWeight: 700 }}>Title</label>
+      <input
+        className="form-input"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        placeholder="Title"
+        aria-label="Title"
+      />
 
-        // Don't add empty notes
-        if (!trimmedTitle && !trimmedContent) return;
+      <label style={{ display: "block", margin: "10px 0 8px", fontWeight: 700 }}>Note</label>
+      <textarea
+        className="form-textarea"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        placeholder="Write your note..."
+        aria-label="Note content"
+      />
 
-        if (editing) {
-            onSave({ ...editing, title: trimmedTitle, content: trimmedContent });
-        } else {
-            onAdd({ title: trimmedTitle || "Untitled", content: trimmedContent });
-            setTitle("");
-            setContent("");
-        }
-    };
-
-    return (
-        <form onSubmit={handleSubmit} className="space-y-3">
-            <input 
-            type="text" 
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Title"
-            className="w-full p-2 rounder border outline-none"
-            />
-
-            <textarea
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Write your note..."
-            className="w-full p-2 rounded border outline-none resize-y min-h-[80px]"
-            />
-
-            <div className="flex gap-2">
-                <button className="px-4 py-2 rounded border" type="submit">
-                    {editing ? "Save" : "Add"}
-                </button>
-                {editing && (
-                    <button
-                    type="button"
-                    onClick={onCancel}
-                    className="px-4 py-2 rounded border"
-                    >
-                        Cancel
-                    </button>
-                )}
-            </div>
-        </form>
-    )
+      <div style={{ display: "flex", gap: 8, alignItems: "center", marginTop: 10 }}>
+        <button type="submit" className="btn-add">
+          {editing ? "Save" : "Add"}
+        </button>
+        {editing && (
+          <button type="button" onClick={onCancel} className="btn-inline">
+            Cancel
+          </button>
+        )}
+      </div>
+    </form>
+  );
 }

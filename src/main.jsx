@@ -1,7 +1,12 @@
 import React from "react";
+import './index.css';
 import { createRoot } from "react-dom/client";
-import TestHook from "./TestHook";
-import TestTheme from "./TestTheme";
-import TestAddNote from "./TestAddNote";
+import App from "./App";
+import "./styles/styles.css"
 
-createRoot(document.getElementById("root")).render(<TestAddNote />);
+// import TestHook from "./TestHook";
+// import TestTheme from "./TestTheme";
+// import TestAddNote from "./TestAddNote";
+// import TestNoteCard from "./TestNoteCard";
+
+createRoot(document.getElementById("root")).render(<App />);
