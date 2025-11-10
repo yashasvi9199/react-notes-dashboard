@@ -20,10 +20,14 @@ export default function AddNoteForm({ onAdd, editing, onCancel, onSave }) {
     const t = title.trim();
     const c = content.trim();
     if (!t && !c) return;
+    
+    const noteData = { title: t || "Untitled", content: c, category: "General" };
+    console.log('Submitting note data:', noteData); // Debug log
+    
     if (editing) {
-      onSave && onSave({ ...editing, title: t, content: c });
+      onSave && onSave({ ...editing, ...noteData });
     } else {
-      onAdd && onAdd({ title: t || "Untitled", content: c });
+      onAdd && onAdd(noteData);
       setTitle("");
       setContent("");
     }
@@ -54,7 +58,7 @@ export default function AddNoteForm({ onAdd, editing, onCancel, onSave }) {
           {editing ? "Save" : "Add"}
         </button>
         {editing && (
-          <button type="button" onClick={onCancel} className="btn-inline">
+          <button style={{color: 'var(--danger)'}}type="button" onClick={onCancel} className="btn-inline">
             Cancel
           </button>
         )}
