@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useState, useEffect } from "react";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import useLocalStorage from "./hooks/useLocalStorage";
 import AddNoteForm from "./components/AddNoteForm";
 import NoteCard from "./components/NoteCard";
+import { fetchNotes, createNote, updateNote, deleteNote } from "./services/notesApi";
 
 /**
  * AppInner - the main UI and logic for notes
@@ -16,9 +17,28 @@ function AppInner(){
   const [notes, setNotes] = useLocalStorage("rn_notes", []);
   const [editing, setEditing] = useState(null);
   const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(true);
   const { theme, toggleTheme } = useTheme();
 
-  // Add a note (prepends to list)
+  // Load notes from API from component mount
+  useEffect( () => {
+    loadNotes();
+  }, []);
+
+  const loadNotes = async () => {
+    try{
+      setLoading(true);
+      const notesData = await fetchNotes();
+      setNotes(notesData);
+    }catch(err){
+      console.error('Failed to load notes: ',err);
+      alert('Failed to load notes. Please check if backened is running.');
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  /* // Add a note (prepends to list)
   const addNote = ({ title, content }) => {
     const newNote = {
       id: Date.now().toString(),
@@ -42,16 +62,60 @@ function AppInner(){
   const saveEdit = (updated) => {
     setNotes( (prev) => prev.map( (n) => (n.id === updated.id ? updated : n )));
     setEditing(null);
+  }; */
+
+
+  //* Add note via API
+  const addNote = async (notesData) => {
+    try{
+      await createNote(notesData);
+      await loadNotes();
+    }catch(err){
+      console.error('Failed to create note: ',err);
+      alert('Failed to create note.')
+    }
+  };
+
+  //* Delete Note via API
+  const deleteNoteHandler = async (id) => {
+    try{
+      await deleteNote(id);
+      await loadNotes();
+      if(editing && editing.id === id) setEditing(null);
+    }catch(err){
+      console.error('Failed to delete note');
+      alert("Failed to delete note.");
+    }
+  };
+
+  //* Save edited note via API
+  const saveEdit = async (updated) => {
+    try{
+      await updateNote(updateNote.id, updated);
+      await loadNotes();
+      setEditing(null);
+    }catch(err){
+      console.error("Failed to update note: ",err);
+      alert("Failed to update note.")
+    }
   };
 
   const cancelEdit = () => setEditing(null);
+  const startEdit = (note) => setEditing(note);
 
   // Simple search/filter
   const filtered = useMemo( () => {
     const q = query.trim().toLowerCase();
     if (!q) return notes;
-    return notes.filter( (n)=> (n.title + " " + n.content).toLowerCase().includes(q));
+    return notes.filter( (n) => 
+      (n.title + " " + n.content).toLowerCase().includes(q)
+    );
   }, [notes, query])
+
+  // Fix the search input handler
+  const handleSearchChange = (e) => {
+    setQuery(e.target.value);
+  }
 
   return(
     <div className={`app-root ${theme === "dark" ? "theme-dark" : "theme-light"}`}>
@@ -65,7 +129,7 @@ function AppInner(){
           <input
             className="search-input"
             value={query}
-            onChange={ (e) => setQuery(e.target.value)}
+            onChange={handleSearchChange}
             placeholder="Search notes..."
             aria-label="Search notes"
           />
@@ -106,7 +170,7 @@ function AppInner(){
                     key={note.id}
                     note={note}
                     onEdit={startEdit}
-                    onDelete={deleteNote}
+                    onDelete={deleteNoteHandler}
                   />
                 ))}
               </div>
