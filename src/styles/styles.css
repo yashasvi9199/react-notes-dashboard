@@ -97,23 +97,38 @@ html, body, #root { height: 100%; margin: 0; padding: 0; }
 
 /* Main layout */
 .app-main {
-  max-width: 1100px;
-  margin: 12px auto 0;
   display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 18px;
-  align-items: start;
+  grid-template-columns: 300px 1fr 250px;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
 }
 
 /* Panels */
 .panel {
-  background: var(--panel-bg);
-  border-radius: 14px;
-  padding: 18px;
-  border: 1px solid var(--panel-border);
-  box-shadow: var(--card-shadow);
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border);
 }
+
 .panel-left { min-height: 240px; }
+
+.panel-center {min-height: 600px;}
+
+.panel-right {
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.panel-right .category-filter {
+  background: transparent;
+  padding: 0;
+  margin: 0;
+}
+
 .panel-list { min-height: 220px; display:flex; align-items:center; justify-content:center; }
 
 /* Panel title: more punch */
@@ -205,6 +220,69 @@ html, body, #root { height: 100%; margin: 0; padding: 0; }
   font-weight: 600;
 }
 .btn-inline:hover { background: rgba(96,165,250,0.08); }
+
+/* Category Filter Styles */
+.category-filter {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.category-filter-btn {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text);
+  text-align: left;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.category-filter-btn:hover {
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+}
+
+.category-filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.note-count {
+  font-size: 12px;
+  opacity: 0.7;
+  background: rgba(0,0,0,0.1);
+  padding: 2px 6px;
+  border-radius: 10px;
+}
+
+.category-filter-btn.active .note-count {
+  background: rgba(255,255,255,0.2);
+}
+
+/* Category badge styles */
+.category-badge {
+  padding: 4px 8px;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--primary);
+}
+
+.theme-dark .category-badge {
+  background: var(--primary-dark);
+  color: var(--primary-light);
+  border-color: var(--primary-light);
+}
 
 /* Empty state */
 .empty {

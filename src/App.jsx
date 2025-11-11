@@ -2,12 +2,14 @@ import React, { useState, useEffect, useCallback } from "react";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import AddNoteForm from "./components/AddNoteForm";
 import NoteCard from "./components/NoteCard";
-import { fetchNotes, createNote, updateNote, deleteNote, searchNotes } from "./services/notesApi";
+import CategoryFilter from "./components/CategoryFilter";
+import { fetchNotes, createNote, updateNote, deleteNote, searchNotes, getNotesByCategory } from "./services/notesApi";
 
 function AppInner(){
   const [notes, setNotes] = useState([]);
   const [editing, setEditing] = useState(null);
   const [query, setQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const { theme, toggleTheme } = useTheme();
@@ -17,10 +19,17 @@ function AppInner(){
     loadNotes();
   }, []);
 
-  const loadNotes = async () => {
+  const loadNotes = async (category = "") => {
     try {
       setLoading(true);
-      const notesData = await fetchNotes();
+      let notesData;
+      
+      if (category) {
+        notesData = await getNotesByCategory(category);
+      } else {
+        notesData = await fetchNotes();
+      }
+      
       setNotes(notesData);
     } catch (error) {
       console.error('Failed to load notes:', error);
@@ -30,10 +39,26 @@ function AppInner(){
     }
   };
 
+  // Handle category filter change
+  const handleCategoryChange = async (category) => {
+    setSelectedCategory(category);
+    setQuery(""); // Clear search when changing category
+    await loadNotes(category);
+  };
+
+  // Calculate note counts per category
+  const noteCounts = React.useMemo(() => {
+    const counts = {};
+    notes.forEach(note => {
+      counts[note.category] = (counts[note.category] || 0) + 1;
+    });
+    return counts;
+  }, [notes]);
+
   // Debounced search function
   const performSearch = useCallback(async (searchQuery) => {
     if (!searchQuery.trim()) {
-      await loadNotes();
+      await loadNotes(selectedCategory);
       setSearching(false);
       return;
     }
@@ -44,18 +69,17 @@ function AppInner(){
       setNotes(searchResults);
     } catch (error) {
       console.error('Search failed:', error);
-      // Fallback to client-side filtering if search API fails
-      await loadNotes();
+      await loadNotes(selectedCategory);
     } finally {
       setSearching(false);
     }
-  }, []);
+  }, [selectedCategory]);
 
   // Debounce search to avoid too many API calls
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       performSearch(query);
-    }, 300); // 300ms delay
+    }, 300);
 
     return () => clearTimeout(timeoutId);
   }, [query, performSearch]);
@@ -64,8 +88,8 @@ function AppInner(){
   const addNote = async (noteData) => {
     try {
       await createNote(noteData);
-      await loadNotes();
-      setQuery(""); // Clear search after adding new note
+      await loadNotes(selectedCategory);
+      setQuery("");
     } catch (error) {
       console.error('Failed to create note:', error);
       alert('Failed to create note.');
@@ -76,7 +100,7 @@ function AppInner(){
   const deleteNoteHandler = async (id) => {
     try {
       await deleteNote(id);
-      await loadNotes();
+      await loadNotes(selectedCategory);
       if (editing && editing.id === id) setEditing(null);
     } catch (error) {
       console.error('Failed to delete note:', error);
@@ -94,7 +118,7 @@ function AppInner(){
       };
       
       await updateNote(updated.id, updateData);
-      await loadNotes();
+      await loadNotes(selectedCategory);
       setEditing(null);
     } catch (error) {
       console.error('Failed to update note:', error);
@@ -160,19 +184,22 @@ function AppInner(){
 
           <div className="meta">
             <div>Total notes: <strong>{notes.length}</strong></div>
-            <div>Searching: <strong>{query ? `"${query}"` : 'No'}</strong></div>
-            <div className="tip">Tip: Search queries the database directly</div>
+            <div>Search: <strong>{query ? `"${query}"` : 'No'}</strong></div>
+            <div>Filter: <strong>{selectedCategory || 'All'}</strong></div>
+            <div className="tip">Tip: Use categories to organize your notes</div>
           </div>
         </aside>
 
-        <section className="panel panel-list">
+        <section className="panel panel-center">
           {loading ? (
             <div className="empty">Loading notes...</div>
           ) : searching ? (
             <div className="empty">Searching...</div>
           ) : notes.length === 0 ? (
             <div className="empty">
-              {query ? `No notes found for "${query}"` : 'No notes found - add your first one!'}
+              {query ? `No notes found for "${query}"` : 
+              selectedCategory ? `No notes found in ${selectedCategory} category` : 
+              'No notes found - add your first one!'}
             </div>
           ) : (
             <div className="grid">
@@ -187,6 +214,15 @@ function AppInner(){
             </div>
           )}
         </section>
+
+        <aside className="panel panel-right">
+          <h2 className="panel-title">Filter by Category</h2>
+          <CategoryFilter 
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+            noteCounts={noteCounts}
+          />
+        </aside>
       </main>
 
       <footer className="app-footer">
