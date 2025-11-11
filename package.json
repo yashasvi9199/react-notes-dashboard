@@ -3,13 +3,16 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://yashasvi9199.github.io/react-notes-dashboard",
   "scripts": {
     "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
     "frontend": "vite",
     "backend": "cd notes-backend && npm run dev",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "framer-motion": "^12.23.24",
