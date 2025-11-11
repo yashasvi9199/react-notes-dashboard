@@ -1,9 +1,9 @@
-import React, { useMemo, useState, useEffect } from "react";
+import React, { useMemo, useState, useEffect, useCallback } from "react";
 import { ThemeProvider, useTheme } from "./context/ThemeContext";
-import useLocalStorage from "./hooks/useLocalStorage";
+// import useLocalStorage from "./hooks/useLocalStorage";
 import AddNoteForm from "./components/AddNoteForm";
 import NoteCard from "./components/NoteCard";
-import { fetchNotes, createNote, updateNote, deleteNote } from "./services/notesApi";
+import { fetchNotes, createNote, updateNote, deleteNote, searchNotes } from "./services/notesApi";
 
 /**
  * AppInner - the main UI and logic for notes
@@ -14,10 +14,11 @@ import { fetchNotes, createNote, updateNote, deleteNote } from "./services/notes
  * uses ThemeContext to read theme and toggle
  */
 function AppInner(){
-  const [notes, setNotes] = useLocalStorage("rn_notes", []);
+  const [notes, setNotes] = useState([]);
   const [editing, setEditing] = useState(null);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [searching, setSearching] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   // Load notes from API from component mount
@@ -64,6 +65,35 @@ function AppInner(){
     setEditing(null);
   }; */
 
+  //* Debounced search function via API
+  const performSearch = useCallback(async (searchQuery) => {
+    if(!searchQuery.trim()){
+      await loadNotes();
+      setSearching(false);
+      return;
+    }
+
+    try{
+      setSearching(true);
+      const searchResults = await searchNotes(searchQuery);
+      setNotes(searchResults);
+    }catch(err){
+      console.error('Search Failed: ',err);
+      // Fallback to client side filter is API fails
+      await loadNotes();
+    }finally{
+      setSearching(false);
+    }
+  },[]);
+  
+  //* Debounced Search to avoid too many API calls
+  useEffect( ()=> {
+    const timeOutId = setTimeout( () => {
+      performSearch(query);
+    }, 300) // added 300ms delay
+
+    return () => clearTimeout(timeOutId);
+  }, [query, performSearch])
 
   //* Add note via API
   const addNote = async (notesData) => {
@@ -137,13 +167,28 @@ function AppInner(){
         </div>
 
         <div className="header-right">
-          <input
-            className="search-input"
-            value={query}
-            onChange={handleSearchChange}
-            placeholder="Search notes..."
-            aria-label="Search notes"
-          />
+          <div style={{position: 'relative'}}>
+            <input
+              className="search-input"
+              value={query}
+              onChange={handleSearchChange}
+              placeholder="Search notes..."
+              aria-label="Search notes"
+            />
+            {searching && (
+              <div style={{
+                position: 'absolute',
+                right: '8px',
+                top: '50%',
+                transform: 'translateY(-50%)',
+                fontSize: '12px',
+                color: 'var(--text-muted'
+              }}>
+                Searching...
+              </div>
+            )}
+          </div>
+
           <button
             className="btn small"
             onClick={toggleTheme}
@@ -172,20 +217,27 @@ function AppInner(){
         <section className="panel panel-list">
           {/* terniary operator being used with "?" and ":" 
           to check if there are any notes or not in panel*/}
-          {filtered.length === 0 ? (
-            <div className="empty">No notes found - add your first one!</div>
-            ) : (
-              <div className="grid">
-                {filtered.map( (note)=> (
-                  <NoteCard 
-                    key={note.id}
-                    note={note}
-                    onEdit={startEdit}
-                    onDelete={deleteNoteHandler}
-                  />
-                ))}
-              </div>
-            )}
+
+          {loading ? (
+            <div className="empty">Loading notes...</div>
+          ) : searching ? (
+            <div className="empty">Searching...</div>
+          ) : notes.length === 0 ? (
+            <div className="empty">
+              {query ? `No notes found for "${query}"` : 'No notes found - add your first one!'}
+            </div>
+          ) : (
+            <div className="grid">
+              {notes.map((note) => (
+                <NoteCard 
+                  key={note.id}
+                  note={note}
+                  onEdit={startEdit}
+                  onDelete={deleteNoteHandler}
+                />
+              ))}
+            </div>
+          )}
         </section>
       </main>
 

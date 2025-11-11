@@ -21,6 +21,30 @@ router.get('/', async (req, res) => {
     }
 });
 
+// New Route for Search
+router.get('/search/:query', async (req,res) => {
+    try{
+        const searchQuery = `%${req.params.query}%`;
+
+        const [rows] = await pool.execute(
+            `SELECT * FROM notes WHERE is_archived = FALSE
+            AND (title LIKE ? AND content LIKE ?)
+            ORDER BY
+                CASE
+                    WHEN title LIKE ? THEN 1
+                    WHEN content LIKE ? THEN 2
+                END
+                created_at DESC`,
+                [searchQuery, searchQuery, searchQuery, searchQuery]
+        );
+
+        res.json(rows);
+    }catch(err){
+        console.errror("Error searching notes: ",err);
+        res.status(500).json({error: 'Faied to search notes'});
+    }
+});
+
 // GET /api/notes/:id - Get single note by ID
 router.get('/:id', async (req,res) => {
     try{

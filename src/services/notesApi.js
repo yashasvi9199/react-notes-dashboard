@@ -12,6 +12,22 @@ export const fetchNotes = async () => {
     }
 };
 
+// Search Notes
+export const searchNotes = async (query) => {
+  try{
+    const response = await fetch(`${API_BASE_URL}/notes/search/${encodedURIComponent(query)}`);
+
+    if(!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to search notes: ${errorText}`);
+    }
+    return await response.json();
+  }catch(err){
+    console.error('Error searching notesw: ',err);
+    throw err;
+  }
+};
+
 // Create new note
 export const createNote = async(noteData) => {
     try{
