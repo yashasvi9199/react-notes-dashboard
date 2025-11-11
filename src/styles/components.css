@@ -352,9 +352,10 @@
 
 
 /* ! FORM COMPONENTS */
-/* * Form input styling */
+/* * Form input styling - FIXED WIDTH */
 .form-input {
   width: 100%;
+  box-sizing: border-box; /* ! Important: Include padding and border in width */
   padding: 8px 12px;
   border: 1px solid var(--border);
   background: var(--bg-secondary);
@@ -370,9 +371,10 @@
   background: var(--bg-primary);
 }
 
-/* * Form textarea styling */
+/* * Form textarea styling - FIXED WIDTH */
 .form-textarea {
   width: 100%;
+  box-sizing: border-box; /* ! Important: Include padding and border in width */
   padding: 8px 12px;
   border: 1px solid var(--border);
   background: var(--bg-secondary);
@@ -388,6 +390,20 @@
   outline: none;
   border-color: var(--primary);
   background: var(--bg-primary);
+}
+/* * Category selector styling - FIXED WIDTH */
+.form-input[type="select"] {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* * Ensure all form elements respect container width */
+form {
+  width: 100%;
+}
+
+form > * {
+  max-width: 100%;
 }
 
 /* * Add/Save button styling */
@@ -407,6 +423,35 @@
   background: var(--primary-dark);
   transform: translateY(-1px);
 }
+
+
+
+
+/* ! CATEGORY SELECTOR COMPONENTS */
+/* * Category selector dropdown styling */
+.category-selector {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.category-selector select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text);
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.category-selector select:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-primary);
+}
+
 
 
 
