@@ -1,51 +1,35 @@
+// API Base URL - will fail on GitHub Pages, fallback to localStorage
 const API_BASE_URL = 'http://localhost:5000/api';
 
-// Fetch all notes
-export const fetchNotes = async () => {
-    try{
-        const response = await fetch(`${API_BASE_URL}/notes`);
-        if(!response.ok) throw new Error('Failed to fetch notes');
-        return await response.json();
-    }catch(err){
-        console.error('Error fetching notes: ',err);
-        throw err;
+// Test database connection
+export const testConnection = async () => {
+  try {
+    // If we're not on localhost, database won't be available
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      return false;
     }
-};
-
-// Search Notes
-export const searchNotes = async (query) => {
-  try{
-    const response = await fetch(`${API_BASE_URL}/notes/search/${encodeURIComponent(query)}`);
-
-    if(!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to search notes: ${errorText}`);
-    }
-    return await response.json();
-  }catch(err){
-    console.error('Error searching notesw: ',err);
-    throw err;
+    
+    const response = await fetch(`${API_BASE_URL}/health`);
+    return response.ok;
+  } catch (error) {
+    console.log('Database connection failed, using localStorage:', error.message);
+    return false;
   }
 };
 
-// Get notes by category
-export const getNotesByCategory = async (category) => {
+// Fetch all notes
+export const fetchNotes = async () => {
   try {
-    const response = await fetch(`${API_BASE_URL}/notes/category/${encodeURIComponent(category)}`);
-    
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`Failed to fetch notes by category: ${errorText}`);
-    }
-    
+    const response = await fetch(`${API_BASE_URL}/notes`);
+    if (!response.ok) throw new Error('Failed to fetch notes');
     return await response.json();
   } catch (error) {
-    console.error('Error fetching notes by category:', error);
+    console.error('Error fetching notes from DB:', error);
     throw error;
   }
 };
 
-// Create new note - updated to handle new response format
+// Create new note
 export const createNote = async (noteData) => {
   try {
     const response = await fetch(`${API_BASE_URL}/notes`, {
@@ -61,15 +45,14 @@ export const createNote = async (noteData) => {
       throw new Error(`Failed to create note: ${errorText}`);
     }
     
-    const result = await response.json();
-    return result.note || result; // Handle both response formats
+    return await response.json();
   } catch (error) {
-    console.error('Error creating note:', error);
+    console.error('Error creating note in DB:', error);
     throw error;
   }
 };
 
-// Update existing note - updated to handle new response format
+// Update existing note
 export const updateNote = async (id, noteData) => {
   try {
     const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
@@ -85,25 +68,62 @@ export const updateNote = async (id, noteData) => {
       throw new Error(`Failed to update note: ${errorText}`);
     }
     
-    const result = await response.json();
-    return result.note || result; // Handle both response formats
+    return await response.json();
   } catch (error) {
-    console.error('Error updating note:', error);
+    console.error('Error updating note in DB:', error);
     throw error;
   }
 };
 
 // Delete note
 export const deleteNote = async (id) => {
-    try{
-        const response = await fetch(`${API_BASE_URL}/notes/${id}`,{
-            method: 'DELETE',
-        });
-
-        if(!response.ok) throw new Error('Failed to delete note');
-        return await response.json()
-    }catch(err){
-        console.error('Error deleting note: ',err)
-        throw err;
+  try {
+    const response = await fetch(`${API_BASE_URL}/notes/${id}`, {
+      method: 'DELETE',
+    });
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to delete note: ${errorText}`);
     }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error deleting note from DB:', error);
+    throw error;
+  }
+};
+
+// Search notes
+export const searchNotes = async (query) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/notes/search/${encodeURIComponent(query)}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to search notes: ${errorText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error searching notes in DB:', error);
+    throw error;
+  }
+};
+
+// Get notes by category
+export const getNotesByCategory = async (category) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/notes/category/${encodeURIComponent(category)}`);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Failed to fetch notes by category: ${errorText}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching notes by category from DB:', error);
+    throw error;
+  }
 };

@@ -5,9 +5,9 @@ import NoteCard from "./components/NoteCard";
 import CategoryFilter from "./components/CategoryFilter";
 import StatsDashboard from "./components/StatsDashboard";
 import ScrollToTop from "./components/ScrollToTop";
-import { fetchNotes, createNote, updateNote, deleteNote, searchNotes, getNotesByCategory } from "./services/notesApi";
+import { fetchNotes, createNote, updateNote, deleteNote, searchNotes, getNotesByCategory, testConnection } from "./services/notesApi";
 
-// Import the new organized CSS
+// Import the CSS
 import "./styles/styles.css";
 import "./styles/components.css";
 
@@ -18,38 +18,93 @@ function AppInner(){
   const [selectedCategory, setSelectedCategory] = useState("");
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
+  const [dbConnected, setDbConnected] = useState(true);
   const { theme, toggleTheme } = useTheme();
 
-  // Load notes from API on component mount
+  // Check database connection and load notes
   useEffect(() => {
-    loadNotes();
+    initializeApp();
   }, []);
 
-  const loadNotes = async (category = "") => {
+  const initializeApp = async () => {
     try {
       setLoading(true);
-      let notesData;
       
+      // Test database connection first
+      const isConnected = await testConnection();
+      setDbConnected(isConnected);
+      
+      if (isConnected) {
+        await loadNotesFromDB();
+      } else {
+        await loadNotesFromLocalStorage();
+      }
+    } catch (error) {
+      console.error('Failed to initialize app:', error);
+      setDbConnected(false);
+      await loadNotesFromLocalStorage();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadNotesFromDB = async (category = "") => {
+    try {
+      let notesData;
       if (category) {
         notesData = await getNotesByCategory(category);
       } else {
         notesData = await fetchNotes();
       }
-      
       setNotes(notesData);
     } catch (error) {
-      console.error('Failed to load notes:', error);
-      alert('Failed to load notes. Please check if backend is running.');
-    } finally {
-      setLoading(false);
+      console.error('Failed to load notes from DB:', error);
+      throw error;
+    }
+  };
+
+  const loadNotesFromLocalStorage = async () => {
+    try {
+      const storedNotes = localStorage.getItem('rn_notes');
+      if (storedNotes) {
+        setNotes(JSON.parse(storedNotes));
+      } else {
+        setNotes([]);
+      }
+    } catch (error) {
+      console.error('Failed to load notes from localStorage:', error);
+      setNotes([]);
+    }
+  };
+
+  const saveNotesToLocalStorage = (notesArray) => {
+    try {
+      localStorage.setItem('rn_notes', JSON.stringify(notesArray));
+    } catch (error) {
+      console.error('Failed to save notes to localStorage:', error);
     }
   };
 
   // Handle category filter change
   const handleCategoryChange = async (category) => {
     setSelectedCategory(category);
-    setQuery(""); // Clear search when changing category
-    await loadNotes(category);
+    setQuery("");
+    
+    if (dbConnected) {
+      await loadNotesFromDB(category);
+    } else {
+      // Client-side filtering for localStorage
+      const storedNotes = localStorage.getItem('rn_notes');
+      if (storedNotes) {
+        const allNotes = JSON.parse(storedNotes);
+        if (category) {
+          const filtered = allNotes.filter(note => note.category === category);
+          setNotes(filtered);
+        } else {
+          setNotes(allNotes);
+        }
+      }
+    }
   };
 
   // Calculate note counts per category
@@ -64,22 +119,42 @@ function AppInner(){
   // Debounced search function
   const performSearch = useCallback(async (searchQuery) => {
     if (!searchQuery.trim()) {
-      await loadNotes(selectedCategory);
+      if (dbConnected) {
+        await loadNotesFromDB(selectedCategory);
+      } else {
+        await loadNotesFromLocalStorage();
+      }
       setSearching(false);
       return;
     }
 
     try {
       setSearching(true);
-      const searchResults = await searchNotes(searchQuery);
-      setNotes(searchResults);
+      if (dbConnected) {
+        const searchResults = await searchNotes(searchQuery);
+        setNotes(searchResults);
+      } else {
+        // Client-side search for localStorage
+        const storedNotes = localStorage.getItem('rn_notes');
+        if (storedNotes) {
+          const allNotes = JSON.parse(storedNotes);
+          const searchResults = allNotes.filter(note => 
+            (note.title + " " + note.content).toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          setNotes(searchResults);
+        }
+      }
     } catch (error) {
       console.error('Search failed:', error);
-      await loadNotes(selectedCategory);
+      if (dbConnected) {
+        await loadNotesFromDB(selectedCategory);
+      } else {
+        await loadNotesFromLocalStorage();
+      }
     } finally {
       setSearching(false);
     }
-  }, [selectedCategory]);
+  }, [selectedCategory, dbConnected]);
 
   // Debounce search to avoid too many API calls
   useEffect(() => {
@@ -90,11 +165,27 @@ function AppInner(){
     return () => clearTimeout(timeoutId);
   }, [query, performSearch]);
 
-  // Add a note via API
+  // Add a note
   const addNote = async (noteData) => {
     try {
-      await createNote(noteData);
-      await loadNotes(selectedCategory);
+      if (dbConnected) {
+        await createNote(noteData);
+        await loadNotesFromDB(selectedCategory);
+      } else {
+        const newNote = {
+          id: Date.now().toString(),
+          title: noteData.title || 'Untitled',
+          content: noteData.content || '',
+          category: noteData.category || 'General',
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+          is_archived: false
+        };
+        
+        const updatedNotes = [newNote, ...notes];
+        setNotes(updatedNotes);
+        saveNotesToLocalStorage(updatedNotes);
+      }
       setQuery("");
     } catch (error) {
       console.error('Failed to create note:', error);
@@ -102,11 +193,17 @@ function AppInner(){
     }
   };
 
-  // Delete note via API
+  // Delete note
   const deleteNoteHandler = async (id) => {
     try {
-      await deleteNote(id);
-      await loadNotes(selectedCategory);
+      if (dbConnected) {
+        await deleteNote(id);
+        await loadNotesFromDB(selectedCategory);
+      } else {
+        const updatedNotes = notes.filter(note => note.id !== id);
+        setNotes(updatedNotes);
+        saveNotesToLocalStorage(updatedNotes);
+      }
       if (editing && editing.id === id) setEditing(null);
     } catch (error) {
       console.error('Failed to delete note:', error);
@@ -114,17 +211,25 @@ function AppInner(){
     }
   };
 
-  // Save edited note via API
+  // Save edited note
   const saveEdit = async (updated) => {
     try {
-      const updateData = {
-        title: updated.title,
-        content: updated.content,
-        category: updated.category
-      };
-      
-      await updateNote(updated.id, updateData);
-      await loadNotes(selectedCategory);
+      if (dbConnected) {
+        const updateData = {
+          title: updated.title,
+          content: updated.content,
+          category: updated.category
+        };
+        
+        await updateNote(updated.id, updateData);
+        await loadNotesFromDB(selectedCategory);
+      } else {
+        const updatedNotes = notes.map(note => 
+          note.id === updated.id ? { ...note, ...updated } : note
+        );
+        setNotes(updatedNotes);
+        saveNotesToLocalStorage(updatedNotes);
+      }
       setEditing(null);
     } catch (error) {
       console.error('Failed to update note:', error);
@@ -137,7 +242,6 @@ function AppInner(){
   // Start edit with auto-scroll to top
   const startEdit = (note) => {
     setEditing(note);
-    // Auto-scroll to top when editing
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -147,6 +251,20 @@ function AppInner(){
 
   return(
     <div className={`app-root ${theme === "dark" ? "theme-dark" : "theme-light"}`}>
+      {/* Database Connection Alert */}
+      {!dbConnected && (
+        <div className="db-alert warning">
+          <div className="alert-content">
+            <strong>⚠️ Local Storage Mode</strong>
+            <p>You cannot access the private database. Using localStorage in your browser. 
+               <a href="https://github.com/yashasvi9199/react-notes-dashboard" target="_blank" rel="noopener noreferrer">
+                 Download the project
+               </a> and run it locally to use MySQL services.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* App Header with Title */}
       <header className="app-header">
         <div className="header-left">
@@ -214,6 +332,7 @@ function AppInner(){
             <div>Total notes: <strong>{notes.length}</strong></div>
             <div>Search: <strong>{query ? `"${query}"` : 'No'}</strong></div>
             <div>Filter: <strong>{selectedCategory || 'All'}</strong></div>
+            <div>Storage: <strong>{dbConnected ? 'Database' : 'LocalStorage'}</strong></div>
             <div className="tip">Tip: Use categories to organize your notes</div>
           </div>
         </aside>
@@ -258,7 +377,7 @@ function AppInner(){
       {/* Scroll to Top Button */}
       <ScrollToTop />
     </div>
-  ); 
+  );
 }
 
 export default function App(){
