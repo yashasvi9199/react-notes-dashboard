@@ -2,15 +2,21 @@ import express from 'express';
 import cors from 'cors';
 import {testConnection} from './config/database.js';
 import notesRouter from './routes/notes.js'
+import categoriesRouter from './routes/categories.js'
 
 const app = express();
 const PORT = 5000;
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: ['http://localhost:5173', 'http://127.0.0.1:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 
-// Use notes route
-app.use('/api/notes', notesRouter)
+app.use(express.json());
+app.use('/api/categories', categoriesRouter);
+app.use('/api/notes', notesRouter);
 
 // Health check
 app.get('/api/health', (req,res) => {
