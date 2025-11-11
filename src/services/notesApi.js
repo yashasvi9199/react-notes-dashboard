@@ -15,7 +15,7 @@ export const fetchNotes = async () => {
 // Search Notes
 export const searchNotes = async (query) => {
   try{
-    const response = await fetch(`${API_BASE_URL}/notes/search/${encodedURIComponent(query)}`);
+    const response = await fetch(`${API_BASE_URL}/notes/search/${encodeURIComponent(query)}`);
 
     if(!response.ok) {
       const errorText = await response.text();
