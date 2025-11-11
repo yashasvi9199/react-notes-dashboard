@@ -3,8 +3,13 @@ import { ThemeProvider, useTheme } from "./context/ThemeContext";
 import AddNoteForm from "./components/AddNoteForm";
 import NoteCard from "./components/NoteCard";
 import CategoryFilter from "./components/CategoryFilter";
-import { fetchNotes, createNote, updateNote, deleteNote, searchNotes, getNotesByCategory } from "./services/notesApi";
 import StatsDashboard from "./components/StatsDashboard";
+import ScrollToTop from "./components/ScrollToTop";
+import { fetchNotes, createNote, updateNote, deleteNote, searchNotes, getNotesByCategory } from "./services/notesApi";
+
+// Import the new organized CSS
+import "./styles/styles.css";
+import "./styles/components.css";
 
 function AppInner(){
   const [notes, setNotes] = useState([]);
@@ -128,7 +133,13 @@ function AppInner(){
   };
 
   const cancelEdit = () => setEditing(null);
-  const startEdit = (note) => setEditing(note);
+
+  // Start edit with auto-scroll to top
+  const startEdit = (note) => {
+    setEditing(note);
+    // Auto-scroll to top when editing
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   const handleSearchChange = (e) => {
     setQuery(e.target.value);
@@ -136,44 +147,60 @@ function AppInner(){
 
   return(
     <div className={`app-root ${theme === "dark" ? "theme-dark" : "theme-light"}`}>
+      {/* App Header with Title */}
       <header className="app-header">
         <div className="header-left">
           <h1 className="app-title">Notes Dashboard</h1>
           <p className="app-sub">A compact Notes app - practice React fundamentals.</p>
         </div>
-
-        <div className="header-right">
-          <div style={{ position: 'relative' }}>
-            <input
-              className="search-input"
-              value={query}
-              onChange={handleSearchChange}
-              placeholder="Search notes..."
-              aria-label="Search notes"
-            />
-            {searching && (
-              <div style={{
-                position: 'absolute',
-                right: '8px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                fontSize: '12px',
-                color: 'var(--text-muted)'
-              }}>
-                Searching...
-              </div>
-            )}
-          </div>
-          <button
-            className="btn small"
-            onClick={toggleTheme}
-          >
-            {theme === "dark" ? "Light" : "Dark"}
-          </button>
-        </div>
       </header>
 
+      {/* Sticky Filter Bar with Categories, Search and Theme Toggle */}
+      <section className="filter-bar">
+        <div className="filter-bar-content">
+          <CategoryFilter 
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+            noteCounts={noteCounts}
+          />
+          
+          <div className="search-theme-container">
+            <div style={{ position: 'relative' }}>
+              <input
+                className="search-input"
+                value={query}
+                onChange={handleSearchChange}
+                placeholder="Search notes..."
+                aria-label="Search notes"
+              />
+              {searching && (
+                <div style={{
+                  position: 'absolute',
+                  right: '8px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  fontSize: '12px',
+                  color: 'var(--text-muted)'
+                }}>
+                  Searching...
+                </div>
+              )}
+            </div>
+            
+            <button
+              className="theme-toggle-btn"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+            >
+              {theme === "dark" ? "☀️" : "🌙"}
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content Area with Three Panels */}
       <main className="app-main">
+        {/* Left Panel - Create/Edit Form */}
         <aside className="panel panel-left">
           <h2 className="panel-title">Create / Edit</h2>
           <AddNoteForm 
@@ -191,6 +218,7 @@ function AppInner(){
           </div>
         </aside>
 
+        {/* Center Panel - Notes List */}
         <section className="panel panel-center">
           {loading ? (
             <div className="empty">Loading notes...</div>
@@ -199,8 +227,8 @@ function AppInner(){
           ) : notes.length === 0 ? (
             <div className="empty">
               {query ? `No notes found for "${query}"` : 
-              selectedCategory ? `No notes found in ${selectedCategory} category` : 
-              'No notes found - add your first one!'}
+               selectedCategory ? `No notes found in ${selectedCategory} category` : 
+               'No notes found - add your first one!'}
             </div>
           ) : (
             <div className="grid">
@@ -216,19 +244,19 @@ function AppInner(){
           )}
         </section>
 
+        {/* Right Panel - Statistics */}
         <aside className="panel panel-right">
-          <StatsDashboard/>
-          <CategoryFilter 
-            selectedCategory={selectedCategory}
-            onCategoryChange={handleCategoryChange}
-            noteCounts={noteCounts}
-          />
+          <StatsDashboard />
         </aside>
       </main>
 
+      {/* Footer */}
       <footer className="app-footer">
         Built for quick revision • Practice hooks, state, context and effects
       </footer>
+
+      {/* Scroll to Top Button */}
+      <ScrollToTop />
     </div>
   );
 }
