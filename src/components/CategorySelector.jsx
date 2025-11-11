@@ -39,15 +39,7 @@ export default function CategorySelector({ selectedCategory, onCategoryChange })
       <select
         value={selectedCategory}
         onChange={(e) => onCategoryChange(e.target.value)}
-        style={{
-          width: '100%',
-          padding: '8px 12px',
-          border: '1px solid var(--border)',
-          borderRadius: '6px',
-          backgroundColor: 'var(--bg-secondary)',
-          color: 'var(--text)',
-          fontSize: '14px'
-        }}
+        className="form-input"
       >
         {categories.map(category => (
           <option key={category.id} value={category.name}>
