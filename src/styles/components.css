@@ -1,0 +1,561 @@
+/* ! GLOBAL VARIABLES AND THEME SETTINGS */
+:root {
+  /* * Base colors */
+  --primary: #3B82F6;
+  --primary-light: #60A5FA;
+  --primary-dark: #1D4ED8;
+  --danger: #EF4444;
+  --success: #10B981;
+  --warning: #F59E0B;
+  
+  /* * Light theme - Glass morphism */
+  --bg-primary: rgba(255, 255, 255, 0.8);
+  --bg-secondary: rgba(255, 255, 255, 0.6);
+  --bg-hover: rgba(255, 255, 255, 0.9);
+  --text: #1F2937;
+  --text-muted: #6B7280;
+  --text-light: #9CA3AF;
+  --border: rgba(209, 213, 219, 0.6);
+  --border-light: rgba(209, 213, 219, 0.4);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  --blur: blur(20px);
+}
+
+.theme-dark {
+  /* * Dark theme - Glass morphism */
+  --bg-primary: rgba(17, 24, 39, 0.8);
+  --bg-secondary: rgba(31, 41, 55, 0.6);
+  --bg-hover: rgba(55, 65, 81, 0.9);
+  --text: #F9FAFB;
+  --text-muted: #D1D5DB;
+  --text-light: #9CA3AF;
+  --border: rgba(75, 85, 99, 0.6);
+  --border-light: rgba(75, 85, 99, 0.4);
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --blur: blur(20px);
+}
+
+
+
+
+/* ! MAIN APP LAYOUT COMPONENTS */
+/* * Three-panel grid layout for main content */
+.app-main {
+  display: grid;
+  grid-template-columns: 300px 1fr 250px;
+  gap: 20px;
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* * Base panel styling with glass morphism */
+.panel {
+  background: var(--bg-primary);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+/* * Left panel for create/edit form */
+.panel-left {
+  position: sticky;
+  top: 20px;
+  height: fit-content;
+}
+
+/* * Center panel for notes list */
+.panel-center {
+  min-height: 600px;
+}
+
+/* * Right panel for statistics */
+.panel-right {
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+
+
+
+/* ! HEADER AND FILTER BAR COMPONENTS */
+/* * Main app header styling */
+.app-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-primary);
+  backdrop-filter: var(--blur);
+}
+
+.header-left h1 {
+  margin: 0;
+  color: var(--text);
+}
+
+.header-left p {
+  margin: 4px 0 0 0;
+  color: var(--text-muted);
+}
+
+/* * Sticky filter bar with search and categories */
+.filter-bar {
+  background: var(--bg-primary);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 20px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  margin: 0;
+}
+
+/* * Filter bar content layout */
+.filter-bar-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex: 1;
+}
+
+/* * Container for search and theme toggle */
+.search-theme-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-left: auto;
+}
+
+
+
+
+/* ! SEARCH AND THEME COMPONENTS */
+/* * Search input styling */
+.search-input {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  backdrop-filter: var(--blur);
+  color: var(--text);
+  border-radius: 8px;
+  font-size: 14px;
+  min-width: 200px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-primary);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-input::placeholder {
+  color: var(--text-muted);
+}
+
+/* * Theme toggle button */
+.theme-toggle-btn {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  backdrop-filter: var(--blur);
+  color: var(--text);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 16px;
+  min-width: 50px;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow);
+}
+
+
+
+
+/* ! CATEGORY FILTER COMPONENTS */
+/* * Category filter in filter bar */
+.filter-bar .category-filter {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+}
+
+.filter-bar .category-filter h3 {
+  margin: 0;
+  font-size: 14px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  min-width: 120px;
+}
+
+/* * Category filter buttons container */
+.filter-bar .category-filter-buttons {
+  display: flex;
+  gap: 6px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding: 4px 0;
+  scrollbar-width: thin;
+}
+
+/* * Individual category filter button */
+.filter-bar .category-filter-btn {
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.filter-bar .category-filter-btn:hover {
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+}
+
+.filter-bar .category-filter-btn.active {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* * Note count badge in category filter */
+.filter-bar .note-count {
+  font-size: 11px;
+  opacity: 0.8;
+  margin-left: 4px;
+}
+
+
+
+
+/* ! NOTE CARD COMPONENTS */
+/* * Individual note card styling */
+.note-card {
+  background: var(--bg-secondary);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  transition: all 0.3s ease;
+}
+
+.note-card:hover {
+  background: var(--bg-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.note-card .title {
+  margin: 0 0 8px 0;
+  color: var(--text);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.note-card .content {
+  margin: 0 0 12px 0;
+  color: var(--text);
+  line-height: 1.5;
+}
+
+.note-card .meta {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* * Category badge on note cards */
+.category-badge {
+  padding: 4px 8px;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: 1px solid var(--primary);
+}
+
+.theme-dark .category-badge {
+  background: var(--primary-dark);
+  color: var(--primary-light);
+  border-color: var(--primary-light);
+}
+
+/* * Edit and delete buttons on note cards */
+.btn-inline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 4px 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-inline:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+.theme-dark .btn-inline {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--border);
+  color: var(--text-light);
+}
+
+.theme-dark .btn-inline:hover {
+  background: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* * Delete button specific styling */
+.btn-inline[style*="color: var(--danger)"] {
+  color: var(--danger) !important;
+  border-color: var(--danger);
+}
+
+.theme-dark .btn-inline[style*="color: var(--danger)"] {
+  color: #fca5a5 !important;
+  border-color: #fca5a5;
+}
+
+.btn-inline[style*="color: var(--danger)"]:hover {
+  background: var(--danger);
+  color: white !important;
+  border-color: var(--danger);
+}
+
+
+
+
+/* ! FORM COMPONENTS */
+/* * Form input styling */
+.form-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text);
+  border-radius: 6px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-primary);
+}
+
+/* * Form textarea styling */
+.form-textarea {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  background: var(--bg-secondary);
+  color: var(--text);
+  border-radius: 6px;
+  font-size: 14px;
+  min-height: 100px;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  background: var(--bg-primary);
+}
+
+/* * Add/Save button styling */
+.btn-add {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-add:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+
+
+
+/* ! STATISTICS DASHBOARD COMPONENTS */
+/* * Statistics dashboard container */
+.stats-dashboard {
+  background: transparent;
+  padding: 0;
+  margin: 0 0 20px 0;
+}
+
+.stats-dashboard h3 {
+  color: var(--text);
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 8px;
+  margin: 0 0 16px 0;
+}
+
+.stats-dashboard h4 {
+  margin: 16px 0 8px 0;
+  font-size: 14px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* * Stat cards for numbers */
+.stat-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 4px;
+}
+
+/* * Category statistics bars */
+.category-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.category-stat-bar {
+  width: 100%;
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.category-stat-fill {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+/* * Recent activity items */
+.recent-activity {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.activity-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.activity-date {
+  font-size: 12px;
+  color: var(--text);
+}
+
+.activity-count {
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+  background: var(--primary-light);
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+.theme-dark .activity-count {
+  background: var(--primary-dark);
+  color: var(--primary-light);
+}
+
+
+
+
+/* ! UTILITY AND MISC COMPONENTS */
+/* * Meta information text */
+.meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-light);
+}
+
+/* * Empty state styling */
+.empty {
+  text-align: center;
+  color: var(--text-muted);
+  padding: 40px 20px;
+  font-style: italic;
+}
+
+/* * Tip text styling */
+.tip {
+  font-size: 11px;
+  color: var(--text-light);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* * Grid layout for notes */
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+/* * Footer styling */
+.app-footer {
+  text-align: center;
+  padding: 20px;
+  color: var(--text-muted);
+  font-size: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 20px;
+}
