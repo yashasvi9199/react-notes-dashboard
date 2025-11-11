@@ -3,6 +3,7 @@ import cors from 'cors';
 import {testConnection} from './config/database.js';
 import notesRouter from './routes/notes.js'
 import categoriesRouter from './routes/categories.js'
+import statsRouter from './routes/stats.js';
 
 const app = express();
 const PORT = 5000;
@@ -17,6 +18,7 @@ app.use(cors({
 app.use(express.json());
 app.use('/api/categories', categoriesRouter);
 app.use('/api/notes', notesRouter);
+app.use('/api/stats', statsRouter);
 
 // Health check
 app.get('/api/health', (req,res) => {

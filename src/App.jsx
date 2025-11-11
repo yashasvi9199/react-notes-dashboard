@@ -4,6 +4,7 @@ import AddNoteForm from "./components/AddNoteForm";
 import NoteCard from "./components/NoteCard";
 import CategoryFilter from "./components/CategoryFilter";
 import { fetchNotes, createNote, updateNote, deleteNote, searchNotes, getNotesByCategory } from "./services/notesApi";
+import StatsDashboard from "./components/StatsDashboard";
 
 function AppInner(){
   const [notes, setNotes] = useState([]);
@@ -216,7 +217,7 @@ function AppInner(){
         </section>
 
         <aside className="panel panel-right">
-          <h2 className="panel-title">Filter by Category</h2>
+          <StatsDashboard/>
           <CategoryFilter 
             selectedCategory={selectedCategory}
             onCategoryChange={handleCategoryChange}
