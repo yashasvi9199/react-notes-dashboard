@@ -214,7 +214,7 @@ cd notes-backend && npm install && cd ..
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/yashasvi9199/react-notes-dashboard/blob/react-notes-dashboard/LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
