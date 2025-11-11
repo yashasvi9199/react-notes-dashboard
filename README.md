@@ -105,8 +105,8 @@ NODE_ENV=development
 npm run dev
 ```
 The application will be available at:
-Frontend: [http://localhost:5173](http://localhost:5173)
-Backend API: [http://localhost:5000](http://localhost:5000)
+Frontend: [http://localhost:5173/react-notes-dashboard/](http://localhost:5173//react-notes-dashboard/)
+Backend API: [http://localhost:5000](http://localhost:5000/)
 
 ## 📁 Project Structure
 Using tree command output
