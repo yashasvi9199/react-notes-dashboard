@@ -109,8 +109,35 @@ Frontend: [http://localhost:5173](http://localhost:5173)
 Backend API: [http://localhost:5000](http://localhost:5000)
 
 ## 📁 Project Structure
-<img width="739" height="878" alt="2025-11-11-202014_669x808_scrot" src="https://github.com/user-attachments/assets/d22efd1a-5d78-4bc5-bc79-c827ea2dde25" />
+Using tree command output
+```bash
+# Generate tree in terminal
+tree -I 'node_modules|dist|.git' --dirsfirst
+```
+```markdown
+| Directory               | Purpose             | Key Files                             |
+|-------------------------|---------------------|---------------------------------------|
+| `src/components/`       | React components    | AddNoteForm, NoteCard, CategoryFilter |
+| `src/services/`         | API communication   | notesApi.js, categoriesApi.js         |
+| `src/styles/`           | CSS styling         | styles.css, components.css            |
+| `notes-backend/`        | Node.js server      | server.js, routes/                    |
+| `notes-backend/routes/` | API endpoints       | notes.js, categories.js, stats.js     |
+```
+**Frontend (React)**
+- `src/components/` - UI components for notes, forms, filters
+- `src/services/` - API communication layer
+- `src/styles/` - CSS files with glass morphism design
+- `src/context/` - React context for theme management
 
+**Backend (Node.js/Express)**
+- `notes-backend/routes/` - REST API endpoints
+- `notes-backend/config/` - Database configuration
+- `notes-backend/middleware/` - Express middleware
+
+**Configuration**
+- `public/` - Static files for GitHub Pages
+- `package.json` - Project dependencies and scripts
+  
 ## 🎯 Usage Guide
 
 Local Development
@@ -157,22 +184,22 @@ SELECT * FROM notes;
 |GET	    |  /api/stats	              |  Get statistics     |
 
 ## 💾 Smart Storage System
-1. Automatic Detection: Checks database connectivity on startup
-1.Graceful Fallback: Seamlessly switches to localStorage when database unavailable
-1. Data Persistence: Notes saved locally in browser when using GitHub Pages version
-1. Migration Ready: Easy transition between storage backends
+- Automatic Detection: Checks database connectivity on startup
+- Graceful Fallback: Seamlessly switches to localStorage when database unavailable
+- Data Persistence: Notes saved locally in browser when using GitHub Pages version
+- Migration Ready: Easy transition between storage backends
 
 ## 🎭 Modern UI/UX
-1. Glass Morphism Design: Translucent panels with backdrop blur effects
-1. Theme System: Toggle between dark and light modes
-1. Responsive Layout: Three-panel design adapts to screen size
-1. Smooth Animations: CSS transitions and micro-interactions
+- Glass Morphism Design: Translucent panels with backdrop blur effects
+- Theme System: Toggle between dark and light modes
+- Responsive Layout: Three-panel design adapts to screen size
+- Smooth Animations: CSS transitions and micro-interactions
 
 ## 🔧 Advanced Functionality
-1. Real-time Search: Debounced search with instant results
-1. Category Filtering: Organize and filter notes by categories
-1. Statistics Dashboard: Visual analytics of notes usage
-1. Bulk Operations: Efficient note management
+- Real-time Search: Debounced search with instant results
+- Category Filtering: Organize and filter notes by categories
+- Statistics Dashboard: Visual analytics of notes usage
+- Bulk Operations: Efficient note management
 
 ## 🐛 Troubleshooting
 
@@ -218,10 +245,10 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## 🙏 Acknowledgments
 
-1. React.js community for excellent documentation
-1. Vite team for fast build tooling
-1. MySQL for robust database solutions
-1. GitHub for free hosting services
+- React.js community for excellent documentation
+- Vite team for fast build tooling
+- MySQL for robust database solutions
+- GitHub for free hosting services
 
 ### Happy Note-Taking! 📝✨
 For questions or support, please open an issue on GitHub.
