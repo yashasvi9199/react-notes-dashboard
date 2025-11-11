@@ -258,7 +258,7 @@ function AppInner(){
       {/* Scroll to Top Button */}
       <ScrollToTop />
     </div>
-  );
+  ); 
 }
 
 export default function App(){
