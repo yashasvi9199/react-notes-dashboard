@@ -6,10 +6,23 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "dev": "npx nodemon server.js",
+    "dev": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["notes", "api", "backend"],
-  "author": "Your Name",
-  "license": "MIT"
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.6.1",
+    "express": "^4.21.2",
+    "mysql2": "^3.15.3"
+  },
+  "keywords": [
+    "notes",
+    "api",
+    "backend"
+  ],
+  "author": "Yash Haldiya",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^3.1.11"
+  }
 }

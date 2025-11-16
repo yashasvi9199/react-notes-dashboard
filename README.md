@@ -38,12 +38,7 @@ cd react-notes-dashboard
 
 ```bash
 # Install frontend dependencies
-npm install
-
-# Install backend dependencies
-cd notes-backend
-npm install
-cd ..
+npm run install:all
 ```
 
 ### 3. Database Setup
