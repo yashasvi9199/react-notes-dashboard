@@ -42,7 +42,7 @@ export default function AddNoteForm({ onAdd, editing, onCancel, onSave }) {
 
   return (
     <form onSubmit={handleSubmit}>
-      <label style={{ display: "block", marginBottom: 8, fontWeight: 700 }}>Title</label>
+      <label style={{ display: "block", marginBottom: 8, fontWeight: 700 }} className="panel-title">Title</label>
       <input
         className="form-input"
         value={title}
@@ -51,7 +51,7 @@ export default function AddNoteForm({ onAdd, editing, onCancel, onSave }) {
         aria-label="Title"
       />
 
-      <label style={{ display: "block", margin: "10px 0 8px", fontWeight: 700 }}>Note</label>
+      <label style={{ display: "block", margin: "10px 0 8px", fontWeight: 700 }} className="panel-title">Note</label>
       <textarea
         className="form-textarea"
         value={content}

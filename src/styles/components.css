@@ -61,10 +61,11 @@
 }
 
 /* * Left panel for create/edit form */
-.panel-left {
+.panel-left .panel-title{
   position: sticky;
   top: 20px;
   height: fit-content;
+  color: var(--text);
 }
 
 /* * Center panel for notes list */

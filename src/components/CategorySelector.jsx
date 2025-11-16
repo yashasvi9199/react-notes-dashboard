@@ -33,7 +33,7 @@ export default function CategorySelector({ selectedCategory, onCategoryChange })
 
   return (
     <div>
-      <label style={{ display: 'block', marginBottom: 8, fontWeight: 700 }}>
+      <label style={{ display: 'block', marginBottom: 8, fontWeight: 700 }} className="panel-title">
         Category
       </label>
       <select
